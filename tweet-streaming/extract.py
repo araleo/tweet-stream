@@ -18,7 +18,7 @@ class Listener(StreamListener):
 
     def on_error(self, status_code):
         with open(".errorlog.txt", "a") as f:
-            f.write("Error streaming", status_code)
+            f.write(f"Error streaming {str(status_code)}")
 
 
 def load_cred():
