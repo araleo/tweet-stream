@@ -17,6 +17,8 @@ services:
       - TWITTER_SECRET_KEY
       - TWITTER_PUBLIC_TOKEN
       - TWITTER_SECRET_TOKEN
+    restart: on-failure
+    
 
   # Database
   mongo:
