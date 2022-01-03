@@ -1,10 +1,14 @@
 import json
 import os
+import sys
+import urllib3
 
 from pymongo import MongoClient
 from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy import StreamListener
+
+from .logging import log_error
 
 
 class Listener(StreamListener):
@@ -17,8 +21,8 @@ class Listener(StreamListener):
         return True
 
     def on_error(self, status_code):
-        with open(".errorlog.txt", "a") as f:
-            f.write(f"Error streaming {str(status_code)}")
+        log_error(f"Streaming error {status_code}")
+        return True
 
 
 def load_cred():
@@ -61,9 +65,13 @@ def main():
     auth = OAuthHandler(key, key_s)
     auth.set_access_token(token, token_s)
     stream = Stream(auth, listener)
-
+   
     try:
         stream.filter(track=screen_names.split(","))
+    except urllib3.exceptions.ProtocolError:
+        msg = f"Mongo Connection Reset By Peer."
+        log_error(msg)
+        sys.exit(msg)
     except KeyboardInterrupt:
         pass
 
