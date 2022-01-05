@@ -26,9 +26,9 @@ TWITTER_SECRET_TOKEN=<token>
 
 ## Tracking users
 
-The SCREEN_NAMES variable in the .env file is supposed to be a comma separated string of twitter handlers that will be tracked by user mentions, ie:
+The SCREEN_NAMES variable in the .env file is supposed to be a comma separated string of twitter handlers that will be tracked by user mentions. E.g.:
 
-`@spam,@eggs,@bacon`
+`SCREEN_NAMES=@spam,@eggs,@bacon`
 
 will stream all tweets in which users @spam or @eggs or @bacon are mentioned (@).
 
@@ -36,4 +36,4 @@ will stream all tweets in which users @spam or @eggs or @bacon are mentioned (@)
 
 By default data is being stored in the MongoDB container in a named volume. If you want to persist data in a different way you can change the mongo db settings in the .env file to point to another Mongo database instance, either local, remote or at the cloud.
 
-If you need to change the port, add it after a colon in the `MONGO_IP` variable in the .env file. Ie `0.0.0.0:27018` would try to connect to a Mongo Instance running in port 27018 of the host computer.
+If you need to change the port, add it after a colon in the `MONGO_IP` variable in the .env file. E.g. `0.0.0.0:27018` would try to connect to a Mongo Instance running in port 27018 of the host computer.
