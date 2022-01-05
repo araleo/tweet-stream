@@ -36,10 +36,12 @@ def load_cred():
 def load_db():
     mongo_user = os.environ.get("MONGO_USER", None)
     mongo_pass = os.environ.get("MONGO_PASS", None)
-    if mongo_user is None or mongo_pass is None:
+    mongo_ip = os.environ.get("MONGO_IP", None)
+    mongo_db = os.environ.get("MONGO_DB", None)
+    if not all([mongo_user, mongo_pass, mongo_ip, mongo_db]):
         return None
 
-    conn_string = f"mongodb://{mongo_user}:{mongo_pass}@mongo/twitter?authSource=admin"
+    conn_string = f"mongodb://{mongo_user}:{mongo_pass}@{mongo_ip}/{mongo_db}?authSource=admin"
     client = MongoClient(conn_string)
     db = client.tweets
     return db
@@ -71,6 +73,9 @@ def main():
     except urllib3.exceptions.ProtocolError:
         msg = f"Mongo Connection Reset By Peer."
         log_error(msg)
+        
+        # We can exit here because Docker will restart
+        # the container and rerun the application.
         sys.exit(msg)
     except KeyboardInterrupt:
         pass
