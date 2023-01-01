@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import os
 import sys
@@ -7,8 +8,6 @@ from pymongo import MongoClient
 from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy import StreamListener
-
-from .logging import log_error
 
 
 class Listener(StreamListener):
@@ -23,6 +22,40 @@ class Listener(StreamListener):
     def on_error(self, status_code):
         log_error(f"Streaming error {status_code}")
         return True
+
+
+def main():
+    key, key_s, token, token_s = load_cred()
+    if not all([key, key_s, token, token_s]):
+        print("Please enter the Twitter credentials in the .env file")
+        return
+
+    screen_names = os.environ.get("SCREEN_NAMES", None)
+    if screen_names is None:
+        print("Please enter the desidred screen names to track in the .env file")
+        return
+
+    db = load_db()
+    if db is None:
+        print("Please enter the MongoDB credentials in the .env file")
+        return
+
+    listener = Listener(db)
+    auth = OAuthHandler(key, key_s)
+    auth.set_access_token(token, token_s)
+    stream = Stream(auth, listener)
+
+    try:
+        stream.filter(track=screen_names.split(","))
+    except urllib3.exceptions.ProtocolError:
+        msg = f"Mongo Connection Reset By Peer."
+        log_error(msg)
+
+        # We can exit here because Docker will restart
+        # the container and rerun the application.
+        sys.exit(msg)
+    except KeyboardInterrupt:
+        pass
 
 
 def load_cred():
@@ -47,38 +80,9 @@ def load_db():
     return db
 
 
-def main():
-    key, key_s, token, token_s = load_cred()
-    if not all([key, key_s, token, token_s]):
-        print("Please enter the Twitter credentials in the .env file.")
-        return
-
-    screen_names = os.environ.get("SCREEN_NAMES", None)
-    if screen_names is None:
-        print("Please enter the desidred screen names to track in the .env file.")
-        return
-
-    db = load_db()
-    if db is None:
-        print("Please enter the MongoDB credentials in the .env file.")
-        return
-
-    listener = Listener(db)
-    auth = OAuthHandler(key, key_s)
-    auth.set_access_token(token, token_s)
-    stream = Stream(auth, listener)
-   
-    try:
-        stream.filter(track=screen_names.split(","))
-    except urllib3.exceptions.ProtocolError:
-        msg = f"Mongo Connection Reset By Peer."
-        log_error(msg)
-        
-        # We can exit here because Docker will restart
-        # the container and rerun the application.
-        sys.exit(msg)
-    except KeyboardInterrupt:
-        pass
+def log_error(msg):
+    with open("errorlog.txt", "a") as f:
+        f.write(f"ERR {datetime.now()} | {msg}\n")
 
 
 if __name__ == "__main__":

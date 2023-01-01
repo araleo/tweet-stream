@@ -20,6 +20,9 @@ services:
       - TWITTER_PUBLIC_TOKEN
       - TWITTER_SECRET_TOKEN
     restart: on-failure
+    volumes:
+      - ./tweet-streaming:/app
+
 
   # Database
   mongo:
