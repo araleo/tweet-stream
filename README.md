@@ -10,20 +10,6 @@ To run the containers and start streaming:
 docker-compose up -d --build
 ```
 
-This app requires a .env file with the following variables:
-```
-MONGO_USER=<username>
-MONGO_PASS=<password>
-MONGO_IP=<ip or service name>
-MONGO_DB=<twitter>
-SCREEN_NAMES=<twitters handler list>
-TWITTER_PUBLIC_KEY=<key>
-TWITTER_SECRET_KEY=<key>
-TWITTER_PUBLIC_TOKEN=<token>
-TWITTER_SECRET_TOKEN=<token>
-
-```
-
 ## Tracking users
 
 The SCREEN_NAMES variable in the .env file is supposed to be a comma separated string of twitter handlers that will be tracked by user mentions. E.g.:
